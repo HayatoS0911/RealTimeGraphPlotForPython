@@ -8,27 +8,27 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 
 
-kRedrawCycle = 1            # msec 再描画間隔
-kDrawSec = 0.3              # sec 何秒分表示するか
-kDrawSamplingRate = 500     # 点  秒間あたりの表示点数
+kRedrawCycle = 1            # msec ReDraw Interval
+kDrawSec = 0.3              # sec Draw Range
+kDrawSamplingRate = 500     # 1s Draw Count
 
 counter = 0;
 
 class GraphData:
-    """ グラフに表示するデータクラス
+    """ Draw Data Class
     """
     def __init__(self):
         self.samplingRate = 1000
         self.counter = 0;
     
     def get_sampling_rate(self):
-        """ サンプリングレート返す
+        """ Return Sampling Rate
         """
         return self.samplingRate
     
     def get_next(self):
         global counter
-        """ グラフ表示用のデータを返す
+        """ Return Next Draw Data
         """
         counter += 1;
         if(counter >= 100):
@@ -37,10 +37,10 @@ class GraphData:
         intList = np.linspace(0, 2*pi, 100)
         y = np.sin(intList)
         intList = [y[counter-1],y[counter]]
-        return intList                                      #テストでSin波データを返す
+        return intList                                      #Return Sin Data
 
 class View:
-    """ グラフ表示用のGUI管理クラス
+    """ Draw Graph Class
     """
     def __init__(self):        
         self.root = Tk.Tk()
@@ -53,7 +53,7 @@ class View:
         self.drawSec = kDrawSec                             # Draw plot Sec
         self.drawSamplingRate = kDrawSamplingRate           # Draw Rate
         
-        # グラフ設定
+        # Set Graph
         self.figure = Figure(figsize=(6,4), dpi=100)             # Graph Size
         self.figureGraph = self.figure.add_subplot(111)                    # Draw Figure Graph
         self.figureGraph.set_title('Test Real Time Plot', size=12)    # Graph Title
@@ -78,15 +78,15 @@ class View:
         self.root.mainloop()                                                                        
     
     def reDrawTimerCallBack(self):
-        """ 定期タイマーコールイベント
+        """ Interval Draw Timer CallBack
         """
         self.add_draw_data(self.serial.get_next())              # Call Get Plot Data
         self.draw_plot()                                        # Call Plot Graph Function
         self.root.after(kRedrawCycle, self.reDrawTimerCallBack) # Start Interval Timer
     
     def add_draw_data(self, data):
-        """ 描画対象のデータを追加
-            @param data データ配列
+        """ Add Draw Data
+            @param data Data List
         """
         samplingRate = self.serial.get_sampling_rate()
         samplingSec = 1. / samplingRate
@@ -113,7 +113,7 @@ class View:
         self.data = self.data[-remainFrameLength:]      # First Delete
         
     def draw_plot(self):
-        """ グラフデータプロット
+        """ Graph Plot
         """
         num_draw_frame = int(self.drawSec * self.drawSamplingRate)   
         draw_sampling_rate = self.drawSamplingRate      # Sampling Rate
